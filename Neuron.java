@@ -65,7 +65,7 @@ public Neuron(int num, int seed, String func){
 
 /**
 * Updates the threshold for this Neuron.
-* @param double threshold New threshold 
+* @param threshold New threshold 
 **/
 public void setTheta(double threshold){ theta = threshold;}
 
@@ -74,18 +74,6 @@ public void setTheta(double threshold){ theta = threshold;}
 * @return 	The current threshold for this Neuron 
 **/
 public double getTheta(){ return theta;}
-
-/**
-* Updates the propagation error for this Neuron.
-* @param error New progagation error for this Neuron
-**/
-public void setPropagateError(double error){ propagate_error = error;}
-
-/**
-* Returns the current propagation error for this Neuron.
-* @return	The current propagation error for this Neuron
-**/
-public double getPropagateError(){ return propagate_error;}
 
 /**
 * Updates the weights of this Neuron.
@@ -144,6 +132,7 @@ public double think(double[] in){
 	else if(currentActivationFunction.equalsIgnoreCase("step")){ sum = stepFunc(sum - theta);}
 	else if(currentActivationFunction.equalsIgnoreCase("sign")){ sum = signFunc(sum - theta);}
 	else if(currentActivationFunction.equalsIgnoreCase("sigmoid")){ sum = sigmFunc(sum - theta);}
+	else if(currentActivationFunction.equalsIgnoreCase("hyperbolic tangent")){ sum = tanhFunc(sum - theta);}
 	
 	return sum;
 }
@@ -174,7 +163,14 @@ private double signFunc(double sum){ return sum >= 0.0 ? 1.0 : -1.0;}
 * @param sum
 * @return	The value of the Sigmoid Function.
 **/
-private double sigmFunc(double sum){return (1.0 / (1.0 + Math.exp(-1.0 * sum)));}
+private double sigmFunc(double sum){ return (1.0 / (1.0 + Math.exp(-1.0 * sum)));}
+
+/**
+* Hyperbolic Tangent Function Y = (e^(2X) - 1.0)/( e^(2X) + 1.0)
+* @param sum
+* @return	The value of the Hyperbolic Tangent Function.
+**/
+private double tanhFunc(double sum){ return ((Math.exp(2.0 * sum) - 1.0) / (Math.exp(2.0 * sum) + 1.0));}
 
 //End Activation Functions
 
@@ -211,6 +207,18 @@ public void setDeltaTheta(double delta){ deltaTheta = delta;}
 * @return	The last delta threshold of this Neuron for Back Propagation.
 **/
 public double getDeltaTheta(){ return deltaTheta;}
+
+/**
+* Updates the propagation error for this Neuron.
+* @param error New progagation error for this Neuron
+**/
+public void setPropagateError(double error){ propagate_error = error;}
+
+/**
+* Returns the current propagation error for this Neuron.
+* @return	The current propagation error for this Neuron
+**/
+public double getPropagateError(){ return propagate_error;}
 
 /**
 * Updates the weights and threshold of this Neuron by using the Delta Weights and Delta Threshold for this Neuron.
