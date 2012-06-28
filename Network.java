@@ -273,7 +273,7 @@ public class Network{
 		//go through each Neuron in the last layer
 		for(int i = 0; i < layers[layers.length - 1]; i++){ deltaThetas[i] = alpha * (-1.0) * error[i];}
 		//need to update the delta thetas of the last layer
-		this.layers.get(numLayer - 1).setDeltaThetas(deltaThetas);
+		this.layers.get(numLayer - 1).setLayerDeltaThetas(deltaThetas);
 		
 		
 		//go through the other layers and do the same things as above
@@ -306,7 +306,7 @@ public class Network{
 				}
 			}
 			//need to update the error gradient of the current layer
-			this.layers.get(i).updateLayerPropagationError(error);
+			this.layers.get(i).setLayerPropagationError(error);
 			//reset the general counter
 			ct = 0; 
 			//calculate the delta weights for the current layer
@@ -328,7 +328,7 @@ public class Network{
 			//go through each Neuron in the current layer
 			for(int q = 0; q < currentNum; q++){ deltaThetas[q] = alpha * (-1.0) * error[q];}
 			//need to update the delta thetas of the current layer
-			this.layers.get(i).setDeltaThetas(deltaThetas);			
+			this.layers.get(i).setLayerDeltaThetas(deltaThetas);			
 		}
 		propagateWeightsAndThetas();
 	}

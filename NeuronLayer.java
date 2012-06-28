@@ -1,3 +1,11 @@
+/* /////////////////////////////////////////////////////////////////////
+//
+// CLASS       	: NeuronLayer
+// AUTHOR(S)   	: Houle, Daniel B
+// DESCRIPTION 	: Holds mulptiple Neurons for the Network.
+// DEPENDENCIES   : Neuron must be in the same directory
+//
+///////////////////////////////////////////////////////////////////// */
 
 import java.util.*;
 import java.util.ArrayList.*;
@@ -228,5 +236,34 @@ public double[] getLayerDeltaWeights(){
 	return delta;
 }
 
+/**
+* Updates the delta thresholds of this Layer for Back Propagation purposes.
+* @param delta The offset for each threshold in this Layer.
+**/
+public void setLayerDeltaThetas(double[] delta){
+	if(delta.length != num_neurons){
+		System.err.println("\n\nThe # of delta thresholds sent to this Layer is incorrect.\n\n");
+		System.exit(1);
+	}
+	//go through each Neuron
+	for(int i = 0; i < num_neurons; i++){ neurons.get(i).setDeltaTheta(delta[i]);}
+}
+
+/**
+* Returns an array of the delta thresholds for this Layer for Back Propagation.
+* @return	An array of the delta thresholds for this Layer.
+**/
+public double[] getLayerDeltaThetas(){
+	double[] delta = new double[num_neurons];
+	for(int i = 0; i < num_neurons; i++){ delta[i] = neurons.get(i).getDeltaTheta();}
+	return delta;
+}
+
+/**
+* Updates the weights and thresholds for every neuron in this Layer.
+**/
+public void propagateWeightsAndThetas(){
+	for(int i = 0; i < num_neurons; i++){ neurons.get(i).propagateWeightsAndThetas();}
+}
 //end class NeuronLayer
 }
