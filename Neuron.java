@@ -29,11 +29,12 @@ private double[] deltaWeights;
 /** the delta threshold that will be used for Back Proagation **/
 private double deltaTheta;
 
-/** Constructor must be told how many inputs it will be recieving, a seed to randomize the initial 
-	 weights & threshold, and the name of the activation function it will be using. 
- @param num # of inputs into this Neuron.
- @param seed Used to seed the Random object used for randomizing the weights and threshold of this Neuron.
- @param func The activation function for this Neuron.
+/** 
+* Constructor must be told how many inputs it will be recieving, a seed to randomize the initial 
+* weights & threshold, and the name of the activation function it will be using. 
+* @param num # of inputs into this Neuron.
+* @param seed Used to seed the Random object used for randomizing the weights and threshold of this Neuron.
+* @param func The activation function for this Neuron.
 **/
 public Neuron(int num, int seed, String func){
 	boolean found = false;
@@ -49,6 +50,7 @@ public Neuron(int num, int seed, String func){
 		System.err.println("\n\nActivation function not recognized.\n\n");
 		System.exit(1);
 	}
+	alpha = Stats.getLearningRate();
 	//set the size of the inputs
 	num_inputs = num;
 	//set the new threshold
@@ -111,10 +113,16 @@ public int getNumInputs(){ return num_inputs;}
 **/
 public double getOutput(){ return output;}
 
+/**
+* Returns the last input into this Neuron.
+* @return	An array of the last inputs this Neuron recieved.
+**/
+public double[] getInput(){ return input;}
+
 //End standard Setters and Getters
 
 /**
-* Recieves the inputs & returns the output of this Neuron.
+* Receives the inputs & returns the output of this Neuron.
 * Sums the multiplication of the inputs and weights, then determines which activation function to use.
 * @param in The new inputs for this Neuron.
 * @return	The single output for this Neuron.
@@ -124,6 +132,9 @@ public double think(double[] in){
 		System.err.println("\n\nThe number of inputs is not correct for this Neuron.\n\n");
 		System.exit(1);
 	}
+	//update the input private member variable
+	input = in;
+	
 	double sum = 0.0;
 	//sum the multiplication of the inputs and weights
 	for(int i = 0; i < num_inputs; i++){ sum += (weight[i] * in[i]);}
@@ -136,7 +147,9 @@ public double think(double[] in){
 	
 	return sum;
 }
+
 //Activation Functions
+
 /**
 * Linear Function Y = X.
 * @param sum 
@@ -227,5 +240,6 @@ public void propagateWeightsAndThetas(){
 	for(int i = 0; i < num_inputs; i++){ weight[i] += deltaWeights[i];}
 	theta += deltaTheta;
 }
+
 //end class Neuron
 }

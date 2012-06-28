@@ -20,8 +20,8 @@ public class Network{
 	private int outputs;
 	/** number of hidden layers in this Network **/
 	private int hidden_layers;
-	/** array of the number of Perceptrons in the hidden layers from top to down **/
-	private int[] perceptronsInHiddenLayers;
+	/** array of the number of Neurons in the hidden layers from top to down **/
+	private int[] neuronsInHiddenLayers;
 	/** the last outputs of this Network **/
 	private double[] output;
 	/** the total number of weights in this Network **/
@@ -36,11 +36,11 @@ public class Network{
 		//get the number of inputs for this Network
 		inputs = Stats.getInputNumber();
 		//get the number of outputs for this Network
-		outputs = Stats.getOutputs();
+		outputs = Stats.getOutputNumber();
 		//get the number of hidden layers for this Network
-		hidden_layers = Stats.getHiddenLayerNumber();
+		hidden_layers = Stats.getNumberOfHiddenLayers();
 		//get the size of each hidden layer in this Network
-		perceptronsInHiddenLayers = Stats.getNumPerHLayer();
+		neuronsInHiddenLayers = Stats.getNumPerHiddenLayer();
 		//get the activation function that will be used for this Network
 		current_activation_function = Stats.getActivationFunction();
 		//initialize the ArrayList
@@ -50,16 +50,16 @@ public class Network{
 		//create a fully connected ANN
 		if(hidden_layers > 0){
 			//input layer doesn't really matter. the 1st hidden layer, or the "last" layer is what actually does the math.
-			//the # of inputs into the network, will be the number of inputs into the perceptrons of the 1st "thinking" layer			
-			//used to setup the inputs of a layer based on the number of perceptrons in the prior layer
+			//the # of inputs into the network, will be the number of inputs into the neurons of the 1st "thinking" layer			
+			//used to setup the inputs of a layer based on the number of neurons in the prior layer
 			int newInput = 0;			
 			//add the hidden layer(s) plus the output Layer. 'hidden_layers' has 1 added to it just incase there are no hidden layers
 			for(int i = 0; i < (hidden_layers + 1); i++){
-				//the # of inputs of the current layer, is based upon the # of perceptrons in the last layer
+				//the # of inputs of the current layer, is based upon the # of neurons in the last layer
 				if(i == 0){ newInput = inputs;}
-				else{ newInput = perceptronsInHiddenLayers[i - 1];}
+				else{ newInput = neuronsInHiddenLayers[i - 1];}
 				//need to create the new NeuronLayer objects and add them to layers
-				if(i < hidden_layers){ layers.add(new NeuronLayer(perceptronsInHiddenLayers[i], newInput, current_activation_function));}
+				if(i < hidden_layers){ layers.add(new NeuronLayer(neuronsInHiddenLayers[i], newInput, current_activation_function));}
 				else{ layers.add(new NeuronLayer(outputs, newInput, current_activation_function));}
 			}			
 		}
@@ -72,7 +72,7 @@ public class Network{
 		num_weights = 0;
 		//traverse each layer
 		for(int i = 0; i < (hidden_layers + 1); i++){
-			num_weights += layers.get(i).getLayerWeightNum();
+			num_weights += layers.get(i).getNumWeights();
 		}	
 	//end constructor
 	}
@@ -134,30 +134,30 @@ public class Network{
 	
 	/**
 	* Updates the weights of this Network by layer & left to right
-	* @param new_weights The new weights for the Perceptrons of this Network
+	* @param new_weights The new weights for the Neurons of this Network
 	**/
 	public void updateNetworkWeights(double[] new_weights){
 		//used to determine the number of weights in each NeuronLayer
 		int layerWeights = 0;
 		//this is used to itterate throuh new_weights
 		int current = 0;		
-		//traverse the layers & find out how many weights/Perceptron there are
+		//traverse the layers & find out how many weights/Neuron there are
 		for(int i = 0; i < (hidden_layers + 1); i++){
-			layerWeights = layers.get(i).getLayerWeightNum();
+			layerWeights = layers.get(i).getNumWeights();
 			double[] iWeights = new double[layerWeights];
 			//get the weights needed for the current layer
 			for(int q = 0; q < layerWeights; q++){
 				iWeights[q] = new_weights[current];
 				current++;
 			}			
-			layers.get(i).updateLayerWeights(iWeights);
+			layers.get(i).setLayerWeights(iWeights);
 		}		
 	//end setWeights()
 	}
 	
 	/**
 	* Updates the thresholds of this Network by layer & left to right
-	* @param new_thetas The new thresholds for the Perceptrons of this Network
+	* @param new_thetas The new thresholds for the Neurons of this Network
 	**/
 	public void updateNetworkThresholds(double[] new_thetas){
 		//used to determine the # of Perceptons in each layer
@@ -165,14 +165,14 @@ public class Network{
 		//this is used to itterate throuh new_thetas
 		int current = 0;
 		for(int i = 0; i < (hidden_layers + 1); i++){
-			layerNum = layers.get(i).getLayerNum();
+			layerNum = layers.get(i).getNumLayer();
 			double[] iTheta = new double[layerNum];
 			//get the thresholds needed for the current layer
 			for(int q = 0; q < layerNum; q++){
 				iTheta[q] = new_thetas[current];
 				current++;
 			}
-			layers.get(i).updateLayerThresholds(iTheta);
+			layers.get(i).setLayerThresholds(iTheta);
 		}
 	}
 
@@ -215,7 +215,7 @@ public class Network{
 	public int[] getNumNeuronsPerLayer(){
 		int[] ret = new int[hidden_layers + 1];
 		//traverse each layer
-		for(int i = 0; i < (hidden_layers + 1); i++){ ret[i] = layers.get(i).getLayerNum();}
+		for(int i = 0; i < (hidden_layers + 1); i++){ ret[i] = layers.get(i).getNumLayer();}
 		return ret;
 	}
 
@@ -236,7 +236,7 @@ public class Network{
 		int error_num = error.length;
 		double[] error_prop, current_errorProp, current_weights;
 		//get the learning rate for this network
-		double alpha = this.layers.get(0).getLearningRate();
+		double alpha = Stats.getLearningRate();
 		//ct is a general counter
 		int ct = 0, currentNum = -1, previousNum = -1;
 		NeuronLayer current = new NeuronLayer(), previous = new NeuronLayer();
@@ -250,15 +250,15 @@ public class Network{
 			for(int i = 0; i < error_num; i++){ error[i] *= output[i] * (1.0 - output[i]);}
 		}	
 		//need to update the error gradient of the last layer
-		this.layers.get(numLayer - 1).updateLayerPropagationError(error);
+		this.layers.get(numLayer - 1).setLayerPropagationError(error);
 		//need to get the last inputs from the output layer
 		double[] lastLayerInputs = this.layers.get(numLayer - 1).getLayerInput();		
 		//need to get the number of weights in the output layer
-		int outputWeightNum = this.layers.get(numLayer - 1).getLayerWeightNum();
+		int outputWeightNum = this.layers.get(numLayer - 1).getNumWeights();
 		//used to hold the delta_weights of the output layer
 		double[] deltaWeights = new double[outputWeightNum];
 		//calculate the delta weights for the output layer
-		//go through each Perceptron in the last layer
+		//go through each Neuron in the last layer
 		for(int i = 0; i < layers[layers.length - 1]; i++){
 			//go through each input of the last layer
 			for(int j = 0; j < lastLayerInputs.length; j++){
@@ -267,10 +267,10 @@ public class Network{
 			}
 		}
 		//need to update the delta weights of the last layer
-		this.layers.get(numLayer - 1).setDeltaWeights(deltaWeights);
+		this.layers.get(numLayer - 1).setLayerDeltaWeights(deltaWeights);
 		//calculate the delta thetas for the output layer
 		double[] deltaThetas = new double[layers[layers.length - 1]];
-		//go through each Perceptron in the last layer
+		//go through each Neuron in the last layer
 		for(int i = 0; i < layers[layers.length - 1]; i++){ deltaThetas[i] = alpha * (-1.0) * error[i];}
 		//need to update the delta thetas of the last layer
 		this.layers.get(numLayer - 1).setDeltaThetas(deltaThetas);
@@ -280,13 +280,13 @@ public class Network{
 		for(int i = numLayer - 2; i >= 0; i--){
 			//need to get the "current" layer and "previous" layer			
 			current = this.getIndividualLayer(i);
-			currentNum = this.layers.get(i).getLayerNum();
+			currentNum = this.layers.get(i).getNumLayer();
 			previous = this.getIndividualLayer(i + 1);
-			previousNum = this.layers.get(i + 1).getLayerNum();
+			previousNum = this.layers.get(i + 1).getNumLayer();
 			//the output of the current layer is the input of the previous layer
 			double[] currentOuput = previous.getLayerInput();
 			double[] currentInput = this.layers.get(i).getLayerInput();
-			deltaWeights = new double[this.layers.get(i).getLayerWeightNum()];
+			deltaWeights = new double[this.layers.get(i).getNumWeights()];
 			double[] previousErrorGradient = previous.getLayerPropagationError();
 			double[] previousWeights = previous.getLayerWeights();
 			//need to calculate the error gradients of the current layer
@@ -310,7 +310,7 @@ public class Network{
 			//reset the general counter
 			ct = 0; 
 			//calculate the delta weights for the current layer
-			//go through each Perceptron in the current layer
+			//go through each Neuron in the current layer
 			for(int q = 0; q < currentNum; q++){
 				//go through each input of the previous layer
 				for(int j = 0; j < currentInput.length; j++){					
@@ -321,11 +321,11 @@ public class Network{
 				}
 			}
 			//need to update the delta weights of the last layer
-			this.layers.get(i).setDeltaWeights(deltaWeights);
+			this.layers.get(i).setLayerDeltaWeights(deltaWeights);
 			
 			//calculate the delta thetas for the current layer
 			deltaThetas = new double[currentNum];
-			//go through each Perceptron in the current layer
+			//go through each Neuron in the current layer
 			for(int q = 0; q < currentNum; q++){ deltaThetas[q] = alpha * (-1.0) * error[q];}
 			//need to update the delta thetas of the current layer
 			this.layers.get(i).setDeltaThetas(deltaThetas);			
@@ -366,8 +366,8 @@ public class Network{
 	}
 	
 	/**
-	* Preints the # of inputs, # of outputs, individual weights and thresholds,
-	* the learning rate, # of layers, and the # of Perceptrons in each layer for this Network.
+	* Prints the # of inputs, # of outputs, individual weights and thresholds,
+	* the learning rate, # of layers, and the # of Neurons in each layer for this Network.
 	**/
 	public void printNetworkInfo(){
 		System.out.println("Network information");

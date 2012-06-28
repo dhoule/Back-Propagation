@@ -15,9 +15,10 @@ private int num_weights;
 /** This is here to make the compiler happy. **/
 public NeuronLayer(){}
 
-/** Constructor must be told the number of Neurons that are in this layer, 
-*   how many inputs each Neuron takes, and the name of the activation 
-*	 function that each Neuron will use. 
+/** 
+* Constructor must be told the number of Neurons that are in this layer, 
+* how many inputs each Neuron takes, and the name of the activation 
+* function that each Neuron will use. 
 * @param num # of Neurons in this Layer
 * @param inputs # of inputs into this Layer. Every Neuron recieves the same input.
 * @param func The activation function for each Neuron in this Layer. 
@@ -152,5 +153,80 @@ public Neuron[] getLayer(){
 	primitive = neurons.toArray(primitive);
 	return primitive; 
 }
+
+/**
+* Receives the inputs & returns the outputs of this Layer
+* @param in The inputs for this Layer
+* @return	The output of every Neuron in this Layer from left to right
+**/
+public double[] think(double[] in){
+	if(in.length != (num_weights/ num_neurons)){
+		System.err.println("\n\nThe # of inputs sent to this Layer is incorrect.\n\n");
+		System.exit(1);
+	}
+	//Each Neuron receives multiple inputs but will only give ONE output
+	double[] outputs = new double[num_neurons];
+	//Each Neuron in this layer will receive the same inputs
+	for(int i = 0; i < num_neurons; i++){ outputs[i] = neurons.get(i).think(in);}
+	return outputs;
+}
+
+/**
+* Returns this Layer's last inputs.
+* @return	The last inputs of this Layer.
+**/
+public double[] getLayerInput(){
+	double[] input = new double[num_weights];
+	int ct = 0;
+	int numInput = num_weights/ num_neurons;
+	//go through each Neuron and get it's last input
+	for(int i = 0; i < num_neurons; i++){
+		double[] temp = neurons.get(i).getInput();
+		//go through each Neurons inputs & add them to input
+		for(int q = 0; q < numInput; q++){
+			input[ct] = temp[q];
+			ct++;
+		}
+	}
+	return input;
+}
+
+/**
+* Updates the delta weights of this Layer for Back Propagation purposes.
+* @param delta The offset for each weight in this Layer.
+**/
+public void setLayerDeltaWeights(double[] delta){
+	if(delta.length != num_weights){
+		System.err.println("\n\nThe # of delta weights sent to this Layer is incorrect.\n\n");
+		System.exit(1);
+	}
+	int weightsPerNeuron = num_weights / num_neurons;
+	int ct = 0;
+	//go through each Neuron
+	for(int i = 0; i < num_neurons; i++){
+		double[] deltaWeights = new double[weightsPerNeuron];
+		//gather the individual weights
+		for(int q = 0; q < weightsPerNeuron; q++){ deltaWeights[q] = delta[ct]; ct++;}
+		neurons.get(i).setDeltaWeights(deltaWeights);
+	}
+}
+
+/**
+* Returns an array of the delta weights for this Layer for Back Propagation.
+* @return	An array of the delta weights for this Layer.
+**/
+public double[] getLayerDeltaWeights(){
+	double[] delta = new double[num_weights];
+	int ct = 0;
+	for(int i = 0; i < num_neurons; i++){
+		double[] current = neurons.get(i).getDeltaWeights();
+		for(int q = 0; q < current.length; q++){
+			delta[ct] = current[q];
+			ct++;
+		}
+	}
+	return delta;
+}
+
 //end class NeuronLayer
 }
