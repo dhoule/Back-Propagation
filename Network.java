@@ -26,8 +26,10 @@ public class Network{
 	private double[] output;
 	/** the total number of weights in this Network **/
 	private int num_weights;
-	/**activation function that is to be used for this object **/
+	/** activation function that is to be used for this object **/
 	private String current_activation_function;
+	/** the learning rate for every Neuron in this Network **/
+	private double alpha;
 	
 	/**
 	* Constructor sets up the layers from the information it gets from Stats.
@@ -43,6 +45,8 @@ public class Network{
 		neuronsInHiddenLayers = Stats.getNumPerHiddenLayer();
 		//get the activation function that will be used for this Network
 		current_activation_function = Stats.getActivationFunction();
+		//get the learning rate for this Network
+		alpha = Stats.getLearningRate();
 		//initialize the ArrayList
 		layers = new ArrayList<NeuronLayer>();
 		
@@ -59,13 +63,13 @@ public class Network{
 				if(i == 0){ newInput = inputs;}
 				else{ newInput = neuronsInHiddenLayers[i - 1];}
 				//need to create the new NeuronLayer objects and add them to layers
-				if(i < hidden_layers){ layers.add(new NeuronLayer(neuronsInHiddenLayers[i], newInput, current_activation_function));}
-				else{ layers.add(new NeuronLayer(outputs, newInput, current_activation_function));}
+				if(i < hidden_layers){ layers.add(new NeuronLayer(neuronsInHiddenLayers[i], newInput, current_activation_function, alpha));}
+				else{ layers.add(new NeuronLayer(outputs, newInput, current_activation_function, alpha));}
 			}			
 		}
 		else{
 			//there are no hidden layers.
-			layers.add(new NeuronLayer(outputs, inputs, current_activation_function));
+			layers.add(new NeuronLayer(outputs, inputs, current_activation_function, alpha));
 		}
 		
 		//accumulator
@@ -235,8 +239,6 @@ public class Network{
 		int numLayer = layers.length;
 		int error_num = error.length;
 		double[] error_prop, current_errorProp, current_weights;
-		//get the learning rate for this network
-		double alpha = Stats.getLearningRate();
 		//ct is a general counter
 		int ct = 0, currentNum = -1, previousNum = -1;
 		NeuronLayer current = new NeuronLayer(), previous = new NeuronLayer();

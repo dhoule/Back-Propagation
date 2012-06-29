@@ -1,4 +1,12 @@
-
+/* /////////////////////////////////////////////////////////////////////
+//
+// CLASS       	: Neuron
+// AUTHOR(S)   	: Houle, Daniel B
+// DESCRIPTION 	: Creates the ANN. A Network object is composed of 1/+ 
+//							NeuronLayer objects
+// DEPENDENCIES   : Mthods must be called correctly.
+//
+///////////////////////////////////////////////////////////////////// */
 
 import java.util.*;
 import java.util.ArrayList.*;
@@ -31,12 +39,13 @@ private double deltaTheta;
 
 /** 
 * Constructor must be told how many inputs it will be recieving, a seed to randomize the initial 
-* weights & threshold, and the name of the activation function it will be using. 
+* weights & threshold, the name of the activation function it will be using, and the learning rate. 
 * @param num # of inputs into this Neuron.
 * @param seed Used to seed the Random object used for randomizing the weights and threshold of this Neuron.
 * @param func The activation function for this Neuron.
+* @param learningRate The learning rate for this Neuron.
 **/
-public Neuron(int num, int seed, String func){
+public Neuron(int num, int seed, String func, double learningRate){
 	boolean found = false;
 	//need to check if the activation function is valid
 	for(int i = 0; i < activationFunction.length; i++){
@@ -50,7 +59,7 @@ public Neuron(int num, int seed, String func){
 		System.err.println("\n\nActivation function not recognized.\n\n");
 		System.exit(1);
 	}
-	alpha = Stats.getLearningRate();
+	alpha = learningRate;
 	//set the size of the inputs
 	num_inputs = num;
 	//set the new threshold

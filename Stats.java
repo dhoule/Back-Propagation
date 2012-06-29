@@ -7,7 +7,6 @@
 // DEPENDENCIES   : Methods must be called correctly.
 //
 ///////////////////////////////////////////////////////////////////// */
-
 public class Stats{
 
 /** # of inputs into the Network **/
@@ -25,6 +24,18 @@ private static double allowed_error_rate;
 /** An array of the # of Neurons in each hidden layer from top-down **/
 private static int[] num_in_hidden_layers;
 
+/**
+* Used to initialize the variables. Must be called before using this class.
+**/
+public static void initializeVariables(){
+	inputs = 0;
+	outputs = 0;
+	hidden_layers = 0;
+	activation_function = "";
+	alpha = 0;
+	allowed_error_rate = 0;
+	num_in_hidden_layers = new int[1];
+}
 
 /**
 * Updates the learning rate that will be used by every Neuron in the Network.

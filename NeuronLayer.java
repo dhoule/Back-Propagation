@@ -30,12 +30,13 @@ public NeuronLayer(){}
 * @param num # of Neurons in this Layer
 * @param inputs # of inputs into this Layer. Every Neuron recieves the same input.
 * @param func The activation function for each Neuron in this Layer. 
+* @param alpha The learning rate for each Neuron in this Layer.
 **/
-public NeuronLayer(int num, int inputs, String func){
+public NeuronLayer(int num, int inputs, String func, double alpha){
 	//set the # of Neurons in this Layer
 	num_neurons = num;
 	//create the Neurons for this Layer
-	for(int i = 0; i < num; i++){ neurons.add(new Neuron(inputs, (new Random()).nextInt(), func));}
+	for(int i = 0; i < num; i++){ neurons.add(new Neuron(inputs, (new Random()).nextInt(), func, alpha));}
 	//set the # of weights for this Layer
 	num_weights = num * inputs;
 }
