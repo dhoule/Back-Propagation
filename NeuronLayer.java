@@ -33,10 +33,11 @@ public NeuronLayer(){}
 * @param alpha The learning rate for each Neuron in this Layer.
 **/
 public NeuronLayer(int num, int inputs, String func, double alpha){
+	neurons = new ArrayList<Neuron>();
 	//set the # of Neurons in this Layer
 	num_neurons = num;
 	//create the Neurons for this Layer
-	for(int i = 0; i < num; i++){ neurons.add(new Neuron(inputs, (new Random()).nextInt(), func, alpha));}
+	for(int i = 0; i < num; i++){ neurons.add(new Neuron(inputs, (new Random()).nextLong(), func, alpha));}
 	//set the # of weights for this Layer
 	num_weights = num * inputs;
 }
@@ -181,24 +182,11 @@ public double[] think(double[] in){
 }
 
 /**
-* Returns this Layer's last inputs.
+* Returns this Layer's last inputs. Each Neuron in a Layer receives the same input, so only have to return the last input
+* of the Neuron at position 0.
 * @return	The last inputs of this Layer.
 **/
-public double[] getLayerInput(){
-	double[] input = new double[num_weights];
-	int ct = 0;
-	int numInput = num_weights/ num_neurons;
-	//go through each Neuron and get it's last input
-	for(int i = 0; i < num_neurons; i++){
-		double[] temp = neurons.get(i).getInput();
-		//go through each Neurons inputs & add them to input
-		for(int q = 0; q < numInput; q++){
-			input[ct] = temp[q];
-			ct++;
-		}
-	}
-	return input;
-}
+public double[] getLayerInput(){ return neurons.get(0).getInput();}
 
 /**
 * Updates the delta weights of this Layer for Back Propagation purposes.

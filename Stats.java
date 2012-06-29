@@ -21,8 +21,8 @@ private static String activation_function;
 private static double alpha;
 /** The acceptable error rate for the Network. Usually 0.001. **/
 private static double allowed_error_rate;
-/** An array of the # of Neurons in each hidden layer from top-down **/
-private static int[] num_in_hidden_layers;
+/** An array of the # of Neurons in each layer from top-down **/
+private static int[] num_in_layers;
 
 /**
 * Used to initialize the variables. Must be called before using this class.
@@ -34,7 +34,7 @@ public static void initializeVariables(){
 	activation_function = "";
 	alpha = 0;
 	allowed_error_rate = 0;
-	num_in_hidden_layers = new int[1];
+	num_in_layers = new int[1];
 }
 
 /**
@@ -113,12 +113,12 @@ public static int getNumberOfHiddenLayers(){ return hidden_layers;}
 * Updates the # of Neurons per hidden layer.
 * @param layers An array of the # of Neurons per hidden layer.
 **/
-public static void setNumPerHiddenLayer(int[] layers){ num_in_hidden_layers = layers;}
+public static void setNumPerLayer(int[] layers){ num_in_layers = layers;}
 
 /**
 * Returns the # of Neurons per hidden layer.
 * @return	An array of the # of Neurons per hidden layer.
 **/
-public static int[] getNumPerHiddenLayer(){ return num_in_hidden_layers;}
+public static int[] getNumPerLayer(){ return num_in_layers;}
 //end class Stats
 }

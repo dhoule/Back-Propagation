@@ -45,7 +45,7 @@ private double deltaTheta;
 * @param func The activation function for this Neuron.
 * @param learningRate The learning rate for this Neuron.
 **/
-public Neuron(int num, int seed, String func, double learningRate){
+public Neuron(int num, long seed, String func, double learningRate){
 	boolean found = false;
 	//need to check if the activation function is valid
 	for(int i = 0; i < activationFunction.length; i++){
@@ -63,7 +63,7 @@ public Neuron(int num, int seed, String func, double learningRate){
 	//set the size of the inputs
 	num_inputs = num;
 	//set the new threshold
-	Random offset = new Random((long) seed);
+	Random offset = new Random(seed);
 	theta = offset.nextDouble();
 	//set the new weights
 	weight = new double[num];

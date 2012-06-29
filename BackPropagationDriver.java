@@ -26,6 +26,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.util.*;
+import java.util.ArrayList.*;
 
 public class BackPropagationDriver{
 
@@ -57,7 +59,9 @@ public static void main(String[] args){
 	Charset charset = Charset.forName("UTF-8");
 	
 	//try to read the information file
-	try(BufferedReader infoInput = Files.newBufferedReader(infoPath, charset)){		
+	BufferedReader infoInput = null;
+	try{
+		infoInput = Files.newBufferedReader(infoPath, charset);		
 		String line = null;
 		String[] nameValue = null;
 		Stats.initializeVariables();
@@ -72,19 +76,56 @@ public static void main(String[] args){
 			setupStatsInfo(nameValue[0].trim(), nameValue[1].trim());
 		}
 	}
-	catch(IOException e){
-		System.err.println("\n\nIOException: " + e.toString() + ".\n\n");
-	}
+	catch(IOException e){ System.err.println("\n\nIOException: " + e.toString() + ".\n\n");}
+	
+	//done with file. Time to close it.
+	try{ infoInput.close();}
+	catch(IOException e){ System.err.println("\n\nIOException: " + e.toString() + ".\n\n");}
+	
+	
+	ArrayList<double[]> patterns = new ArrayList<double[]>();
 	//try to read the data file
-	try(BufferedReader dataInput = Files.newBufferedReader(dataPath, charset)){		
+	BufferedReader dataInput = null;
+	try{
+		dataInput = Files.newBufferedReader(dataPath, charset);		
 		String line = null;
+		int totalElementsCount = Stats.getInputNumber() + Stats.getOutputNumber();
+		String[] patternOutput = null;
 		while ((line = dataInput.readLine()) != null) {
-			System.out.println(line);
+			//pattern must be seperated by commas
+			if(line.contains(",")){
+				patternOutput = line.split(",");
+				//need to make sure the pattern and it's output(s) == the input and output #
+				if(patternOutput.length != totalElementsCount){
+					try{ dataInput.close();}
+					catch(IOException e){ System.err.println("\n\nIOException: " + e.toString() + ".\n\n");}
+					System.err.println("Pattern elements does not equal the # of inputs and outputs given.");
+					System.exit(1);
+				}
+				//convert the elements into doubles
+				double[] elements = new double[totalElementsCount];
+				for(int i = 0; i < totalElementsCount; i++){ elements[i] = (new Double(patternOutput[i])).doubleValue();}
+				//add this pattern to patterns
+				patterns.add(elements);
+			}
+			else{
+				try{ dataInput.close();}
+				catch(IOException e){ System.err.println("\n\nIOException: " + e.toString() + ".\n\n");}
+				System.err.println("Pattern of data file is incorrect. Pattern must be seperated by commas.");
+				System.exit(1);
+			}
 		}
 	}
-	catch(IOException e){
-		System.err.println("\n\nIOException: " + e.toString() + "\n\n");
-	}
+	catch(IOException e){ System.err.println("\n\nIOException: " + e.toString() + "\n\n");}
+	
+	//done with file. Time to close it.
+	try{ dataInput.close();}
+	catch(IOException e){ System.err.println("\n\nIOException: " + e.toString() + ".\n\n");}
+	
+	//The information has been collected, formated, and setup.
+	receiving(patterns);
+	
+	System.exit(0);
 }
 
 /**
@@ -111,19 +152,19 @@ private static void setupStatsInfo(String name, String value){
 	else if(name.equalsIgnoreCase("Error Rate") || name.equalsIgnoreCase("ErrorRate")){
 		Stats.setAllowedErrorRate((new Double(value)).doubleValue());
 	}
-	else if(name.equalsIgnoreCase("Neurons Per Hidden Layer") || name.equalsIgnoreCase("Neurons Per Hidden Layer") || 
-			  name.equalsIgnoreCase("Neurons Per Hidden Layer") || name.equalsIgnoreCase("Neurons Per Hidden Layer") ||
-			  name.equalsIgnoreCase("Neurons Per Hidden Layer") || name.equalsIgnoreCase("NeuronsPerHiddenLayer")){
+	else if(name.equalsIgnoreCase("Neurons Per Layer") || name.equalsIgnoreCase("Neurons PerLayer") || 
+			  name.equalsIgnoreCase("NeuronsPer Layer") || name.equalsIgnoreCase("NeuronsPerLayer")){
 		int[] layers = null;
 		if(value.contains(",")){
 			String[] num = value.split(",");
-			for(int i = 0; i < num.length; i++){ layers[i] = (new Integer(num[i])).intValue();}
+			layers = new int[num.length];
+			for(int i = 0; i < num.length; i++){ layers[i] = (new Integer(num[i].trim())).intValue();}
 		}
 		else{
 			layers = new int[1];
-			layers[0] = new Integer(value).intValue();
+			layers[0] = new Integer(value.trim()).intValue();
 		}
-		Stats.setNumPerHiddenLayer(layers);
+		Stats.setNumPerLayer(layers);
 	}
 	else{
 		System.err.println("\n\nThe name property " + name + " is unknown.\n\n");
@@ -131,5 +172,63 @@ private static void setupStatsInfo(String name, String value){
 	}
 }
 
+private static void receiving(ArrayList<double[]> patterns){
+	
+	//create a new ANN
+	Network ann = new Network();
+	//get the allowed error rate
+	double errorRate = Stats.getAllowedErrorRate();
+	//get the # of inputs
+	int numInput = Stats.getInputNumber();
+	//get the # of outputs
+	int numOutput = Stats.getOutputNumber();
+	//determine the # of patterns
+	int numPatterns = patterns.size();
+	//this will keep track of the # of times the patterns are run through
+	int epochCount = 0;
+	//need to go through at least ONE run through the pattern
+	do{
+		epochCount++;
+	}while((1.0/run(patterns, numPatterns, ann, errorRate, numInput, numOutput)) < (1.0/errorRate));
+	
+	System.out.println("\n\nIt took " + epochCount + " runs.\n");
+	ann.printNetworkInfo();
+	System.out.println("\n\n");
+}
+
+private static double run(ArrayList<double[]> patterns, int numPatterns, 
+								  Network ann, double errorRate, int numInput, int numOutput){
+								  
+	double[] runError = new double[numPatterns];
+	
+	//go through the patterns
+	for(int i = 0; i < numPatterns; i++){
+		//need to get the inputs & outs from the pattern
+		double[] inputs = new double[numInput];
+		double[] desiredOutput = new double[numOutput];
+		double[] currentPattern = patterns.get(i);
+		//seperate the inputs from the pattern
+		for(int q = 0; q < numInput; q++){ inputs[q] = currentPattern[q];}
+		//seperate the outputs from the pattern
+		for(int q = 0; q < numOutput; q++){ desiredOutput[q] = currentPattern[q + numInput];}
+		
+		double currentError = 0.0;
+		double[] actualOutput = ann.think(inputs);
+		double[] individualErrors = new double[numOutput];
+		boolean errorFound = false;
+		//need to compare the actualOutput against the desiredOutput & use the sum of the squares
+		for(int q = 0; q < numOutput; q++){ 
+			individualErrors[q] = desiredOutput[q] - actualOutput[q];
+			if(Math.abs(individualErrors[q]) > errorRate){ errorFound = true;}
+			currentError += individualErrors[q] * individualErrors[q];
+		}
+		runError[i] = currentError;
+		if(errorFound){ ann.backPropagateError(individualErrors, actualOutput);}
+	}
+	double sumOfTheSquares = 0.0;
+	for(int i = 0; i < numPatterns; i++){ sumOfTheSquares += runError[i] * runError[i];}
+	
+	return  sumOfTheSquares;
+}
 //end class BackPropagationDriver
 }

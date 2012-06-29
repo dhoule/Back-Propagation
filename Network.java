@@ -42,7 +42,7 @@ public class Network{
 		//get the number of hidden layers for this Network
 		hidden_layers = Stats.getNumberOfHiddenLayers();
 		//get the size of each hidden layer in this Network
-		neuronsInHiddenLayers = Stats.getNumPerHiddenLayer();
+		neuronsInHiddenLayers = Stats.getNumPerLayer();
 		//get the activation function that will be used for this Network
 		current_activation_function = Stats.getActivationFunction();
 		//get the learning rate for this Network
@@ -310,7 +310,7 @@ public class Network{
 			//need to update the error gradient of the current layer
 			this.layers.get(i).setLayerPropagationError(error);
 			//reset the general counter
-			ct = 0; 
+			ct = 0; 	
 			//calculate the delta weights for the current layer
 			//go through each Neuron in the current layer
 			for(int q = 0; q < currentNum; q++){
