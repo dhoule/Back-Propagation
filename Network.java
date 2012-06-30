@@ -373,6 +373,7 @@ public class Network{
 	**/
 	public void printNetworkInfo(){
 		System.out.println("Network information");
+		System.out.println("Activation Function: " + current_activation_function);
 		System.out.println("# of inputs: " + inputs);
 		System.out.println("# of outputs: " + outputs);
 		this.printLayerCountInfo();
