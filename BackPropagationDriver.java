@@ -130,8 +130,8 @@ public static void main(String[] args){
 
 /**
 * Sets up the information in the static Stats class that is used to build and run the ANN.
-* @param property An array of 2 elements that simulates a name/value pairing. It must match
-*						certain criteria or the program will exit with an error code of 2.
+* @param name The name property
+* @param value The value property
 **/
 private static void setupStatsInfo(String name, String value){
 	if(name.equalsIgnoreCase("Input")){
@@ -189,18 +189,18 @@ private static void receiving(ArrayList<double[]> patterns){
 	//need to go through at least ONE run through the pattern
 	do{
 		epochCount++;
-	}while((1.0/run(patterns, numPatterns, ann, errorRate, numInput, numOutput)) < (1.0/errorRate));
+	}while(run(patterns, numPatterns, ann, errorRate, numInput, numOutput));
 	
 	System.out.println("\n\nIt took " + epochCount + " runs.\n");
 	ann.printNetworkInfo();
 	System.out.println("\n\n");
 }
 
-private static double run(ArrayList<double[]> patterns, int numPatterns, 
+private static boolean run(ArrayList<double[]> patterns, int numPatterns, 
 								  Network ann, double errorRate, int numInput, int numOutput){
 								  
 	double[] runError = new double[numPatterns];
-	
+	boolean errorFound = false;
 	//go through the patterns
 	for(int i = 0; i < numPatterns; i++){
 		//need to get the inputs & outs from the pattern
@@ -215,7 +215,6 @@ private static double run(ArrayList<double[]> patterns, int numPatterns,
 		double currentError = 0.0;
 		double[] actualOutput = ann.think(inputs);
 		double[] individualErrors = new double[numOutput];
-		boolean errorFound = false;
 		//need to compare the actualOutput against the desiredOutput & use the sum of the squares
 		for(int q = 0; q < numOutput; q++){ 
 			individualErrors[q] = desiredOutput[q] - actualOutput[q];
@@ -225,10 +224,8 @@ private static double run(ArrayList<double[]> patterns, int numPatterns,
 		runError[i] = currentError;
 		if(errorFound){ ann.backPropagateError(individualErrors, actualOutput);}
 	}
-	double sumOfTheSquares = 0.0;
-	for(int i = 0; i < numPatterns; i++){ sumOfTheSquares += runError[i] * runError[i];}
 	
-	return  sumOfTheSquares;
+	return errorFound;
 }
 //end class BackPropagationDriver
 }

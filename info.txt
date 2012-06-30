@@ -3,5 +3,5 @@ Output: 1
 Hidden Layers: 1
 Activation Function: Sigmoid
 Alpha: 0.3
-Error Rate: 0.000001
-Neurons Per Layer: 3
+Error Rate: 0.001
+Neurons Per Layer: 2

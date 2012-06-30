@@ -373,8 +373,9 @@ public class Network{
 	**/
 	public void printNetworkInfo(){
 		System.out.println("Network information");
-		System.out.println("# of inputs " + inputs);
-		System.out.println("# of outputs " + outputs);
+		System.out.println("# of inputs: " + inputs);
+		System.out.println("# of outputs: " + outputs);
+		this.printLayerCountInfo();
 		this.printWeights();
 		this.printThresholds();
 		System.out.println("___________________");
@@ -389,6 +390,15 @@ public class Network{
 			System.out.print(i + ": " + output[i]);
 		}
 		System.out.println("");
+	}
+	
+	/**
+	* Prints the # of Neurons in every Layer in this Network.
+	**/
+	public void printLayerCountInfo(){
+		int layerNum = layers.size();
+		System.out.println("Layer information:");
+		for(int i = 0; i < layerNum; i++){System.out.println("Layer " + i + ": " + layers.get(i).getNumLayer());}
 	}
 //end Network class
 }
