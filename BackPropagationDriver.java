@@ -199,7 +199,7 @@ private static void receiving(ArrayList<double[]> patterns){
 private static boolean run(ArrayList<double[]> patterns, int numPatterns, 
 								  Network ann, double errorRate, int numInput, int numOutput){
 								  
-	double[] runError = new double[numPatterns];
+	//double[] runError = new double[numPatterns];
 	boolean errorFound = false;
 	//go through the patterns
 	for(int i = 0; i < numPatterns; i++){
@@ -212,16 +212,16 @@ private static boolean run(ArrayList<double[]> patterns, int numPatterns,
 		//seperate the outputs from the pattern
 		for(int q = 0; q < numOutput; q++){ desiredOutput[q] = currentPattern[q + numInput];}
 		
-		double currentError = 0.0;
+		//double currentError = 0.0;
 		double[] actualOutput = ann.think(inputs);
 		double[] individualErrors = new double[numOutput];
 		//need to compare the actualOutput against the desiredOutput & use the sum of the squares
 		for(int q = 0; q < numOutput; q++){ 
 			individualErrors[q] = desiredOutput[q] - actualOutput[q];
 			if(Math.abs(individualErrors[q]) > errorRate){ errorFound = true;}
-			currentError += individualErrors[q] * individualErrors[q];
+			//currentError += individualErrors[q] * individualErrors[q];
 		}
-		runError[i] = currentError;
+		//runError[i] = currentError;
 		if(errorFound){ ann.backPropagateError(individualErrors, actualOutput);}
 	}
 	

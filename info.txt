@@ -1,7 +1,0 @@
-Input: 2
-Output: 1
-Hidden Layers: 0
-Activation Function: Sigmoid
-Alpha: 0.3
-Error Rate: 0.0001
-Neurons Per Layer: 1
